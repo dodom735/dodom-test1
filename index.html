@@ -1,14 +1,18 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini AI Chat</title>
+    <link href='/style.css' rel='stylesheet'>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <div id="chat-container"></div>
+    <div id="input-form">
+        <textarea id="prompt-input" placeholder="Enter your message..."></textarea>
+        <button id="send-button">Send</button>
+    </div>
+    <script defer type="text/javascript" src="/main.js"></script>
 </body>
 </html>
