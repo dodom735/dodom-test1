@@ -24,3 +24,4 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 - feat: Implement calendar with todo functionality
 - docs: Update README.md
 - docs: Finalize README.md
+- docs: Finalize README again
