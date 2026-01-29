@@ -1,4 +1,4 @@
-# Todo Calendar
+# dodom-test1
 
 A simple, client-side calendar application to manage daily notes or to-do items.
 
@@ -22,3 +22,4 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 ## Implemented Features
 - feat: initial commit with project setup
 - feat: Implement calendar with todo functionality
+- docs: Update README.md
