@@ -4,6 +4,7 @@ class TodoCalendar {
         this.currentDate = new Date();
         this.selectedDate = null;
         this.notes = this.loadNotes();
+        this.loadTheme(); // Load theme on initialization
         this.render();
     }
 
@@ -12,6 +13,7 @@ class TodoCalendar {
             <div class="calendar-header">
                 <button class="nav-button" id="prev-month">&lt;</button>
                 <h2 id="current-month-year"></h2>
+                <button class="theme-toggle-button" id="theme-toggle"><span></span></button> <!-- New toggle button -->
                 <button class="nav-button" id="next-month">&gt;</button>
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
@@ -30,6 +32,7 @@ class TodoCalendar {
 
         this.renderCalendarGrid();
         this.addEventListeners();
+        this.updateThemeToggleButton();
     }
 
     renderCalendarGrid() {
@@ -116,6 +119,9 @@ class TodoCalendar {
                 this.hideNoteModal();
             }
         });
+
+        // Theme toggle
+        this.app.querySelector('#theme-toggle').addEventListener('click', () => this.toggleTheme());
     }
 
     changeMonth(delta) {
@@ -145,8 +151,6 @@ class TodoCalendar {
         this.selectedDate = null;
     }
 
-
-
     saveNote() {
         const textarea = this.app.querySelector('#note-textarea');
         const noteText = textarea.value.trim();
@@ -175,6 +179,36 @@ class TodoCalendar {
 
     saveNotesToStorage() {
         localStorage.setItem('todo-calendar-notes', JSON.stringify(this.notes));
+    }
+
+    // Theme methods
+    loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+        } else {
+            // Default to dark theme if no preference is saved
+            document.body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    toggleTheme() {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        this.updateThemeToggleButton();
+    }
+
+    updateThemeToggleButton() {
+        const toggleButton = this.app.querySelector('#theme-toggle');
+        const currentTheme = document.body.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            toggleButton.innerHTML = '☀️'; // Sun icon for light mode
+        } else {
+            toggleButton.innerHTML = '🌙'; // Moon icon for dark mode
+        }
     }
 }
 
