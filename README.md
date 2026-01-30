@@ -16,7 +16,7 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 - **Dark/Light Mode:** Toggle between dark and light themes for personalized viewing.
 
-- **Major Korean Holidays:** Displays major Korean public holidays.
+- **Comprehensive Korean Holidays:** Displays all major Korean public holidays, including lunar-based holidays (Seollal, Chuseok) and substitute holidays, marked in red.
 
 - **Responsive:** The calendar is designed to work on different screen sizes.
 
@@ -52,10 +52,14 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 - feat: Add major Korean holidays
 
+- feat: Add comprehensive Korean holidays with red styling
+
 - docs: Update README.md
 
 - docs: Finalize README.md
 
 - docs: Finalize README again
+
+
 
 
