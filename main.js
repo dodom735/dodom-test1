@@ -299,10 +299,11 @@ class TodoCalendar {
         return `${d.getUTCFullYear()}-${weekNo < 10 ? '0' : ''}${weekNo}`;
     }
 
-    // Helper to get the upcoming Saturday of the current week
-    getUpcomingSaturday(date) {
+    // Helper to get the Saturday of the current week (Sunday-based week)
+    getSaturdayOfWeek(date) {
         const d = new Date(date);
-        d.setDate(d.getDate() + (6 - d.getDay() + 7) % 7); // 6 is Saturday
+        d.setDate(d.getDate() - d.getDay()); // Go back to Sunday of the current week
+        d.setDate(d.getDate() + 6); // Move forward to Saturday
         return d.toISOString().split('T')[0]; // Return YYYY-MM-DD string
     }
 
@@ -321,7 +322,7 @@ class TodoCalendar {
         alert(lottoNoteString); // Display immediately
 
         // Save to upcoming Saturday
-        const upcomingSaturdayDateString = this.getUpcomingSaturday(new Date());
+        const upcomingSaturdayDateString = this.getSaturdayOfWeek(new Date()); // Use the new helper
         this.notes[upcomingSaturdayDateString] = lottoNoteString;
         this.saveNotesToStorage();
 
