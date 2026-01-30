@@ -20,7 +20,7 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 - **Comprehensive Korean Holidays:** Displays all major Korean public holidays, including lunar-based holidays (Seollal, Chuseok) and substitute holidays, marked in red.
 
-- **Enhanced Lotto Generator:** Always active, generates 5 sets of Lotto numbers (1-45), saves them to the current week's Saturday note, and allows only one generation per week.
+- **Enhanced Lotto Generator:** The Lotto button is always active. It generates 5 sets of Lotto numbers (1-45), which are then saved as a note on the upcoming Saturday of the current week. Generation is limited to once per week, with the button becoming disabled after use and re-enabling the following week. A tooltip indicates its status.
 
 - **Responsive:** The calendar is designed to work on different screen sizes.
 
@@ -44,7 +44,7 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 7.  Click the sun/moon icon to toggle between dark and light themes.
 
-8.  Click the "🎱 로또" button to generate 5 sets of Lotto numbers for the current week's Saturday. This can only be done once per week. Hover over the button to see if it's disabled for the current week.
+8.  Click the "🎱 로또" button to generate 5 sets of Lotto numbers. These will be saved to the upcoming Saturday of the current week. You can generate numbers only once per week. Hover over the button to see its current status.
 
 
 
@@ -66,11 +66,15 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 - feat: Enhance Lotto generator: always active, save to calendar, one-time weekly generation
 
+- fix: Corrected Lotto generator logic - always active, weekly save, one-time generation
+
 - docs: Update README.md
 
 - docs: Finalize README.md
 
 - docs: Finalize README again
+
+
 
 
 
