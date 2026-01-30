@@ -6,6 +6,8 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 
 
+- **Waterdrop UI Design:** A soft, rounded, and fluid aesthetic for a modern look.
+
 - **Monthly Calendar View:** Navigate through months and see a full monthly calendar.
 
 - **Daily Notes:** Click on any day to add, edit, or delete a note for that day.
@@ -17,6 +19,8 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 - **Dark/Light Mode:** Toggle between dark and light themes for personalized viewing.
 
 - **Comprehensive Korean Holidays:** Displays all major Korean public holidays, including lunar-based holidays (Seollal, Chuseok) and substitute holidays, marked in red.
+
+- **Saturday Lotto Generator:** A gamified element that generates 5 sets of Lotto numbers (1-45) on Saturdays.
 
 - **Responsive:** The calendar is designed to work on different screen sizes.
 
@@ -40,6 +44,8 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 7.  Click the sun/moon icon to toggle between dark and light themes.
 
+8.  On Saturdays, click the "🎱 로또" button to generate 5 sets of Lotto numbers.
+
 
 
 ## Implemented Features
@@ -54,11 +60,15 @@ A simple, client-side calendar application to manage daily notes or to-do items.
 
 - feat: Add comprehensive Korean holidays with red styling
 
+- feat: Add waterdrop UI and Saturday Lotto generator
+
 - docs: Update README.md
 
 - docs: Finalize README.md
 
 - docs: Finalize README again
+
+
 
 
 
