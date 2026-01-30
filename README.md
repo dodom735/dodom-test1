@@ -9,7 +9,7 @@
 
 ## Features
 
-- **Princess-speak Translation:** Converts normal Korean text into exaggerated, third-person, emoji-filled "princess-speak" with aggressive emoji insertion.
+- **Princess-speak Translation:** Converts normal Korean text into exaggerated, third-person, with **chaotic, in-sentence emoji insertion.**
 - **Princess Power (공주력) Percentage:** Calculates and displays a "Princess Power" score (0-100%) for the translated text, making 100% challenging to achieve.
 - **Princess Title (공주 칭호):** Assigns a humorous "Princess Title" based on keywords found in the input text (e.g., "항상 배가 고픈 공주").
 - **Instant Transformation:** Quick and responsive text conversion.
@@ -21,3 +21,4 @@
 ## Implemented Features
 - feat: Implement Princess-speak Translator (공주어 트랜스레이터) base project
 - feat: Add Princess Power, Princess Title, and aggressive emojis
+- fix: Enhance emoji insertion for chaotic, in-sentence placement
