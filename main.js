@@ -1,3 +1,32 @@
+const KOREAN_HOLIDAYS = {
+    "2026-01-01": "신정", // New Year's Day
+    "2026-03-01": "삼일절", // Independence Movement Day
+    "2026-05-05": "어린이날", // Children's Day
+    "2026-06-06": "현충일", // Memorial Day
+    "2026-08-15": "광복절", // Liberation Day
+    "2026-10-03": "개천절", // National Foundation Day
+    "2026-10-09": "한글날", // Hangul Day
+    "2026-12-25": "크리스마스", // Christmas Day
+
+    "2027-01-01": "신정",
+    "2027-03-01": "삼일절",
+    "2027-05-05": "어린이날",
+    "2027-06-06": "현충일",
+    "2027-08-15": "광복절",
+    "2027-10-03": "개천절",
+    "2027-10-09": "한글날",
+    "2027-12-25": "크리스마스",
+
+    "2028-01-01": "신정",
+    "2028-03-01": "삼일절",
+    "2028-05-05": "어린이날",
+    "2028-06-06": "현충일",
+    "2028-08-15": "광복절",
+    "2028-10-03": "개천절",
+    "2028-10-09": "한글날",
+    "2028-12-25": "크리스마스",
+};
+
 class TodoCalendar {
     constructor(selector) {
         this.app = document.querySelector(selector);
@@ -68,7 +97,8 @@ class TodoCalendar {
         for (let day = 1; day <= daysInMonth; day++) {
             const dayCell = document.createElement('div');
             dayCell.classList.add('day-cell');
-            dayCell.dataset.date = new Date(year, month, day).toISOString().split('T')[0];
+            const dateString = new Date(year, month, day).toISOString().split('T')[0];
+            dayCell.dataset.date = dateString;
 
             const dayNumber = document.createElement('div');
             dayNumber.classList.add('day-number');
@@ -78,6 +108,16 @@ class TodoCalendar {
             const today = new Date();
             if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
                 dayCell.classList.add('today');
+            }
+
+            // Check for holidays
+            const holidayName = KOREAN_HOLIDAYS[dateString];
+            if (holidayName) {
+                dayCell.classList.add('holiday');
+                const holidayText = document.createElement('div');
+                holidayText.classList.add('holiday-name');
+                holidayText.textContent = holidayName;
+                dayCell.appendChild(holidayText);
             }
 
             const note = this.notes[dayCell.dataset.date];
