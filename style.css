@@ -1,18 +1,11 @@
 .day-cell.holiday {
     background-color: var(--holiday-bg);
-    color: var(--holiday-color);
     font-weight: bold;
 }
 
-.day-cell.holiday .day-number {
-    color: var(--holiday-number-color);
-}
-
-.holiday-name {
-    font-size: 0.7em;
-    color: var(--holiday-name-color);
-    margin-top: 5px;
-    text-align: center;
+.day-cell.holiday .day-number,
+.day-cell.holiday .holiday-name {
+    color: var(--holiday-color-red); /* Apply red color */
 }
 
 :root { /* Default Dark Theme */
@@ -35,9 +28,7 @@
     --delete-button-bg: #cf6679;
     --cancel-button-bg: #444;
     --holiday-bg: #3a3a3a; /* Dark theme holiday background */
-    --holiday-color: #bb86fc; /* Dark theme holiday text color */
-    --holiday-number-color: #bb86fc; /* Dark theme holiday number color */
-    --holiday-name-color: #bb86fc; /* Dark theme holiday name color */
+    --holiday-color-red: #ff3333; /* A vibrant red for dark theme */
 }
 
 body[data-theme="light"] {
@@ -60,9 +51,7 @@ body[data-theme="light"] {
     --delete-button-bg: #e53935;
     --cancel-button-bg: #9e9e9e;
     --holiday-bg: #fffde7; /* Light theme holiday background */
-    --holiday-color: #d84315; /* Light theme holiday text color */
-    --holiday-number-color: #d84315; /* Light theme holiday number color */
-    --holiday-name-color: #d84315; /* Light theme holiday name color */
+    --holiday-color-red: #cc0000; /* A slightly darker red for light theme for better contrast */
 }
 
 body {
