@@ -75,7 +75,8 @@ class TodoCalendar {
             <div class="calendar-header">
                 <button class="nav-button" id="prev-month">&lt;</button>
                 <h2 id="current-month-year"></h2>
-                <button class="theme-toggle-button" id="theme-toggle"><span></span></button> <!-- New toggle button -->
+                <button class="lotto-button" id="lotto-generator-button">🎱 로또</button> <!-- New Lotto button -->
+                <button class="theme-toggle-button" id="theme-toggle"><span></span></button>
                 <button class="nav-button" id="next-month">&gt;</button>
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
@@ -95,6 +96,7 @@ class TodoCalendar {
         this.renderCalendarGrid();
         this.addEventListeners();
         this.updateThemeToggleButton();
+        this.updateLottoButtonState(); // Update Lotto button state after rendering
     }
 
     renderCalendarGrid() {
@@ -111,7 +113,7 @@ class TodoCalendar {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         // Days of week headers
-        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토']; // Korean day names
         daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
             dayHeader.classList.add('day-header');
@@ -195,6 +197,9 @@ class TodoCalendar {
 
         // Theme toggle
         this.app.querySelector('#theme-toggle').addEventListener('click', () => this.toggleTheme());
+
+        // Lotto generator button
+        this.app.querySelector('#lotto-generator-button').addEventListener('click', () => this.generateLottoNumbers());
     }
 
     changeMonth(delta) {
@@ -207,7 +212,7 @@ class TodoCalendar {
         const textarea = this.app.querySelector('#note-textarea');
         const modalTitle = this.app.querySelector('#modal-title');
 
-        modalTitle.textContent = new Date(this.selectedDate).toLocaleDateString('en-US', {
+        modalTitle.textContent = new Date(this.selectedDate).toLocaleDateString('ko-KR', { // Changed to ko-KR
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -281,6 +286,29 @@ class TodoCalendar {
             toggleButton.innerHTML = '☀️'; // Sun icon for light mode
         } else {
             toggleButton.innerHTML = '🌙'; // Moon icon for dark mode
+        }
+    }
+
+    // Lotto methods
+    generateLottoNumbers() {
+        const lottoResults = [];
+        for (let i = 0; i < 5; i++) { // Generate 5 sets
+            const numbers = new Set();
+            while (numbers.size < 6) {
+                numbers.add(Math.floor(Math.random() * 45) + 1);
+            }
+            lottoResults.push(Array.from(numbers).sort((a, b) => a - b));
+        }
+        alert("오늘의 로또 번호:\n" + lottoResults.map(set => set.join(', ')).join('\n'));
+    }
+
+    updateLottoButtonState() {
+        const lottoButton = this.app.querySelector('#lotto-generator-button');
+        const currentDayOfWeek = this.currentDate.getDay(); // 0 for Sunday, 6 for Saturday
+        if (currentDayOfWeek === 6) { // If it's Saturday
+            lottoButton.disabled = false;
+        } else {
+            lottoButton.disabled = true;
         }
     }
 }

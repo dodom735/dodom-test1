@@ -22,13 +22,15 @@
     --not-current-month-color: #555;
     --hover-bg: #2a2a2a;
     --modal-overlay-bg: rgba(0, 0, 0, 0.7);
-    --modal-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    --modal-shadow: 0 8px 25px rgba(0,0,0,0.4); /* Softer shadow */
     --modal-input-bg: #2c2c2c;
     --modal-input-border: #444;
     --delete-button-bg: #cf6679;
     --cancel-button-bg: #444;
     --holiday-bg: #3a3a3a; /* Dark theme holiday background */
-    --holiday-color-red: #ff3333; /* A vibrant red for dark theme */
+    --holiday-color-red: #ff4d4d; /* A vibrant red for dark theme */
+    --border-radius-main: 20px; /* Larger radius for main elements */
+    --border-radius-sm: 12px; /* Smaller radius for inner elements */
 }
 
 body[data-theme="light"] {
@@ -45,13 +47,14 @@ body[data-theme="light"] {
     --not-current-month-color: #aaaaaa;
     --hover-bg: #e5e5e5;
     --modal-overlay-bg: rgba(0, 0, 0, 0.5);
-    --modal-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    --modal-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Softer shadow */
     --modal-input-bg: #ffffff;
     --modal-input-border: #bbbbbb;
     --delete-button-bg: #e53935;
     --cancel-button-bg: #9e9e9e;
-    --holiday-bg: #fffde7; /* Light theme holiday background */
+    --holiday-bg: #fffbe6; /* Light theme holiday background */
     --holiday-color-red: #cc0000; /* A slightly darker red for light theme for better contrast */
+    /* border-radius variables are inherited from root, or can be overridden if needed */
 }
 
 body {
@@ -70,8 +73,8 @@ body {
     width: 100%;
     max-width: 900px;
     background-color: var(--surface-color);
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    border-radius: var(--border-radius-main); /* Apply waterdrop style */
+    box-shadow: var(--modal-shadow); /* Softer shadow */
     overflow: hidden;
 }
 
@@ -81,12 +84,16 @@ body {
     align-items: center;
     padding: 20px 30px;
     background-color: var(--calendar-header-bg);
+    border-top-left-radius: var(--border-radius-main); /* Match app border-radius */
+    border-top-right-radius: var(--border-radius-main); /* Match app border-radius */
 }
 
 .calendar-header h2 {
     margin: 0;
     font-weight: 500;
     font-size: 1.5em;
+    flex-grow: 1; /* Allow title to take up space */
+    text-align: center; /* Center the title */
 }
 
 .nav-button {
@@ -96,10 +103,13 @@ body {
     font-size: 2em;
     cursor: pointer;
     transition: color 0.3s;
+    padding: 5px 10px; /* Add padding for better click area */
+    border-radius: var(--border-radius-sm); /* Rounded buttons */
 }
 
 .nav-button:hover {
     color: var(--primary-color);
+    background-color: rgba(var(--primary-color), 0.1); /* Subtle hover effect */
 }
 
 .theme-toggle-button {
@@ -109,14 +119,40 @@ body {
     font-size: 1.5em;
     cursor: pointer;
     transition: color 0.3s;
-    margin: 0 10px; /* Add some margin */
+    margin: 0 10px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 5px 10px; /* Add padding for better click area */
+    border-radius: var(--border-radius-sm); /* Rounded buttons */
 }
 
 .theme-toggle-button:hover {
     color: var(--primary-color);
+    background-color: rgba(var(--primary-color), 0.1); /* Subtle hover effect */
+}
+
+.lotto-button {
+    background-color: #4CAF50; /* Green for success/money */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius-sm); /* Rounded button */
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.lotto-button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.lotto-button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .calendar-grid {
@@ -139,11 +175,14 @@ body {
     padding: 8px;
     background-color: var(--surface-color);
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border-radius: var(--border-radius-sm); /* Waterdrop style */
+    overflow: hidden; /* Ensure content respects border-radius */
 }
 
 .day-cell:hover {
     background-color: var(--hover-bg);
+    box-shadow: 0 0 15px rgba(var(--primary-color), 0.3); /* Subtle glow on hover */
 }
 
 .day-cell.not-current-month {
@@ -177,9 +216,9 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     background-color: var(--primary-variant);
-    color: var(--on-primary-color); /* Changed from on-surface-color for better contrast */
+    color: var(--on-primary-color);
     padding: 2px 4px;
-    border-radius: 4px;
+    border-radius: var(--border-radius-sm); /* Waterdrop style */
 }
 
 #note-modal {
@@ -202,7 +241,7 @@ body {
 .modal-content {
     background-color: var(--modal-bg);
     padding: 30px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-main); /* Waterdrop style */
     width: 90%;
     max-width: 500px;
     box-shadow: var(--modal-shadow);
@@ -220,7 +259,7 @@ body {
     background-color: var(--modal-input-bg);
     border: 1px solid var(--modal-input-border);
     color: var(--on-surface-color);
-    border-radius: 4px;
+    border-radius: var(--border-radius-sm); /* Waterdrop style */
     padding: 10px;
 }
 
@@ -234,7 +273,7 @@ body {
 .modal-button {
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--border-radius-sm); /* Waterdrop style */
     cursor: pointer;
     font-weight: bold;
     color: var(--on-primary-color);
@@ -251,4 +290,5 @@ body {
 .cancel-button {
     background-color: var(--cancel-button-bg);
 }
+
 
