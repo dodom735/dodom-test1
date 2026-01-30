@@ -1,14 +1,35 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo Calendar</title>
-    <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 공주어 트랜스레이터 👑</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app"></div>
-    <script defer type="text/javascript" src="/main.js"></script>
+    <div id="app-container">
+        <header>
+            <h1>공주어 트랜스레이터 👑</h1>
+            <p class="tagline">말은 평범했는데... 공주가 되어버렸습니다 ✨</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <textarea id="input-text" placeholder="평범한 말을 적으세요 👀"></textarea>
+                <button id="translate-button" class="btn-primary">✨ 공주로 만들어줘 ✨</button>
+            </div>
+
+            <div class="result-section">
+                <div id="result-card" class="card">
+                    <p id="result-text">변환된 공주어가 여기에 나타날 거예요! 💖</p>
+                    <button id="copy-button" class="btn-icon">📋 복사하기</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-message" class="toast"></div>
+
+    <script src="main.js"></script>
 </body>
 </html>

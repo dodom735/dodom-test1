@@ -1,369 +1,111 @@
-const KOREAN_HOLIDAYS = {
-    // 2026년 공휴일
-    "2026-01-01": "신정", // New Year's Day
-    "2026-02-16": "설날 연휴", // Lunar New Year's Day
-    "2026-02-17": "설날", // Lunar New Year's Day
-    "2026-02-18": "설날 연휴", // Lunar New Year's Day
-    "2026-03-01": "삼일절", // Independence Movement Day
-    "2026-03-02": "대체공휴일 (삼일절)", // Substitute Holiday - Samiljeol
-    "2026-05-05": "어린이날", // Children's Day
-    "2026-05-24": "부처님오신날", // Buddha's Birthday
-    "2026-05-25": "대체공휴일 (부처님오신날)", // Substitute Holiday - Buddha's Birthday
-    "2026-06-06": "현충일", // Memorial Day
-    "2026-08-15": "광복절", // Liberation Day
-    "2026-08-17": "대체공휴일 (광복절)", // Substitute Holiday - Gwangbokjeol
-    "2026-09-24": "추석 연휴", // Chuseok - 1st day
-    "2026-09-25": "추석", // Chuseok
-    "2026-09-26": "추석 연휴", // Chuseok - 2nd day
-    "2026-10-03": "개천절", // National Foundation Day
-    "2026-10-05": "대체공휴일 (개천절)", // Substitute Holiday - Gaecheonjeol
-    "2026-10-09": "한글날", // Hangul Day
-    "2026-12-25": "크리스마스", // Christmas Day
+const inputText = document.getElementById('input-text');
+const translateButton = document.getElementById('translate-button');
+const resultText = document.getElementById('result-text');
+const copyButton = document.getElementById('copy-button');
+const toastMessage = document.getElementById('toast-message');
 
-    // 2027년 공휴일
-    "2027-01-01": "신정", // New Year's Day
-    "2027-02-06": "설날 연휴",
-    "2027-02-07": "설날",
-    "2027-02-08": "설날 연휴",
-    "2027-02-09": "대체공휴일 (설날)", // Substitute Holiday - Seollal
-    "2027-03-01": "삼일절",
-    "2027-05-05": "어린이날",
-    "2027-05-13": "부처님오신날",
-    "2027-06-06": "현충일",
-    "2027-08-15": "광복절",
-    "2027-08-16": "대체공휴일 (광복절)",
-    "2027-09-14": "추석 연휴",
-    "2027-09-15": "추석",
-    "2027-09-16": "추석 연휴",
-    "2027-10-03": "개천절",
-    "2027-10-04": "대체공휴일 (개천절)",
-    "2027-10-09": "한글날",
-    "2027-10-11": "대체공휴일 (한글날)",
-    "2027-12-25": "크리스마스",
-    "2027-12-27": "대체공휴일 (크리스마스)",
-
-    // 2028년 공휴일
-    "2028-01-01": "신정",
-    "2028-01-26": "설날 연휴",
-    "2028-01-27": "설날",
-    "2028-01-28": "설날 연휴",
-    "2028-03-01": "삼일절",
-    "2028-05-05": "어린이날",
-    "2028-05-01": "부처님오신날",
-    "2028-06-06": "현충일",
-    "2028-08-15": "광복절",
-    "2028-10-02": "추석 연휴",
-    "2028-10-03": "추석",
-    "2028-10-04": "추석 연휴",
-    "2028-10-05": "대체공휴일 (개천절)", // 개천절이 추석 연휴와 겹쳐서 대체공휴일 발생
-    "2028-10-09": "한글날",
-    "2028-12-25": "크리스마스",
+const PRONOUN_MAP = {
+    '나': '공주는', '나는': '공주는', '내가': '공주가', '내': '공주의', '저': '공주는', '저는': '공주는', '제가': '공주가', '저의': '공주의',
+    '우리': '공주님들은', '우리는': '공주님들은', '우리가': '공주님들이', '우리의': '공주님들의'
 };
 
-class TodoCalendar {
-    constructor(selector) {
-        this.app = document.querySelector(selector);
-        this.currentDate = new Date();
-        this.selectedDate = null;
-        this.notes = this.loadNotes();
-        this.lastLottoGeneratedWeek = localStorage.getItem('lotto-generated-week'); // Initialize
-        this.loadTheme(); // Load theme on initialization
-        this.render();
-    }
+const EXAGGERATED_PHRASES = [
+    '정말이지...', '세상에!', '어머나!', '맙소사!', '이게 무슨 일이죠?', '정말 곤란하답니다 🥹', '공주 심장이 콩닥콩닥!', '어떡하죠? 💖', '말도 안돼요!', '공주는 행복하답니다 ✨'
+];
 
-    render() {
-        this.app.innerHTML = `
-            <div class="calendar-header">
-                <button class="nav-button" id="prev-month">&lt;</button>
-                <h2 id="current-month-year"></h2>
-                <button class="lotto-button" id="lotto-generator-button">🎱 로또</button> <!-- New Lotto button -->
-                <button class="theme-toggle-button" id="theme-toggle"><span></span></button>
-                <button class="nav-button" id="next-month">&gt;</button>
-            </div>
-            <div class="calendar-grid" id="calendar-grid"></div>
-            <div id="note-modal">
-                <div class="modal-content">
-                    <h3 id="modal-title"></h3>
-                    <textarea id="note-textarea"></textarea>
-                    <div class="modal-buttons">
-                        <button class="modal-button save-button" id="save-note">Save</button>
-                        <button class="modal-button delete-button" id="delete-note">Delete</button>
-                        <button class="modal-button cancel-button" id="cancel-note">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        `;
+const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '🦄', '💫', '🌟', '🌷', '🦋', '🦢'];
 
-        this.renderCalendarGrid();
-        this.addEventListeners();
-        this.updateThemeToggleButton();
-        this.updateLottoButtonState(); // Update Lotto button state after rendering
-    }
-
-    renderCalendarGrid() {
-        const grid = this.app.querySelector('#calendar-grid');
-        const header = this.app.querySelector('#current-month-year');
-        grid.innerHTML = '';
-
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-
-        header.textContent = `${this.currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
-
-        const firstDayOfMonth = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        // Days of week headers
-        const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토']; // Korean day names
-        daysOfWeek.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.classList.add('day-header');
-            dayHeader.textContent = day;
-            grid.appendChild(dayHeader);
-        });
-
-        // Blank cells for days before the first of the month
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.classList.add('day-cell', 'not-current-month');
-            grid.appendChild(emptyCell);
-        }
-
-        // Day cells for the current month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dayCell = document.createElement('div');
-            dayCell.classList.add('day-cell');
-            const dateString = new Date(year, month, day).toISOString().split('T')[0];
-            dayCell.dataset.date = dateString;
-
-            const dayNumber = document.createElement('div');
-            dayNumber.classList.add('day-number');
-            dayNumber.textContent = day;
-            dayCell.appendChild(dayNumber);
-
-            const today = new Date();
-            if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-                dayCell.classList.add('today');
-            }
-
-            // Check for holidays
-            const holidayName = KOREAN_HOLIDAYS[dateString];
-            if (holidayName) {
-                dayCell.classList.add('holiday');
-                const holidayText = document.createElement('div');
-                holidayText.classList.add('holiday-name');
-                holidayText.textContent = holidayName;
-                dayCell.appendChild(holidayText);
-            }
-
-            const note = this.notes[dayCell.dataset.date];
-            if (note) {
-                const noteIndicator = document.createElement('div');
-                noteIndicator.classList.add('note-indicator');
-                dayCell.appendChild(noteIndicator);
-
-                const todoItem = document.createElement('div');
-                todoItem.classList.add('todo-item');
-                todoItem.textContent = note;
-                dayCell.appendChild(todoItem);
-            }
-
-            grid.appendChild(dayCell);
-        }
-    }
-
-    addEventListeners() {
-        // Month navigation
-        this.app.querySelector('#prev-month').addEventListener('click', () => this.changeMonth(-1));
-        this.app.querySelector('#next-month').addEventListener('click', () => this.changeMonth(1));
-
-        // Day click
-        this.app.querySelector('#calendar-grid').addEventListener('click', (e) => {
-            const dayCell = e.target.closest('.day-cell');
-            if (dayCell && dayCell.dataset.date) {
-                this.selectedDate = dayCell.dataset.date;
-                this.showNoteModal();
-            }
-        });
-
-        // Modal buttons
-        this.app.querySelector('#save-note').addEventListener('click', () => this.saveNote());
-        this.app.querySelector('#delete-note').addEventListener('click', () => this.deleteNote());
-        this.app.querySelector('#cancel-note').addEventListener('click', () => this.hideNoteModal());
-        this.app.querySelector('#note-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'note-modal') {
-                this.hideNoteModal();
-            }
-        });
-
-        // Theme toggle
-        this.app.querySelector('#theme-toggle').addEventListener('click', () => this.toggleTheme());
-
-        // Lotto generator button
-        this.app.querySelector('#lotto-generator-button').addEventListener('click', () => this.generateLottoNumbers());
-    }
-
-    changeMonth(delta) {
-        this.currentDate.setMonth(this.currentDate.getMonth() + delta);
-        this.render();
-    }
-
-    showNoteModal() {
-        const modal = this.app.querySelector('#note-modal');
-        const textarea = this.app.querySelector('#note-textarea');
-        const modalTitle = this.app.querySelector('#modal-title');
-
-        modalTitle.textContent = new Date(this.selectedDate).toLocaleDateString('ko-KR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        textarea.value = this.notes[this.selectedDate] || '';
-        modal.classList.add('show');
-        textarea.focus();
-    }
-
-    hideNoteModal() {
-        const modal = this.app.querySelector('#note-modal');
-        modal.classList.remove('show');
-        this.selectedDate = null;
-    }
-
-    saveNote() {
-        const textarea = this.app.querySelector('#note-textarea');
-        const noteText = textarea.value.trim();
-
-        if (noteText) {
-            this.notes[this.selectedDate] = noteText;
-        } else {
-            delete this.notes[this.selectedDate];
-        }
-
-        this.saveNotesToStorage();
-        this.hideNoteModal();
-        this.renderCalendarGrid();
-    }
-
-    deleteNote() {
-        delete this.notes[this.selectedDate];
-        this.saveNotesToStorage();
-        this.hideNoteModal();
-        this.renderCalendarGrid();
-    }
-
-    loadNotes() {
-        return JSON.parse(localStorage.getItem('todo-calendar-notes')) || {};
-    }
-
-    saveNotesToStorage() {
-        localStorage.setItem('todo-calendar-notes', JSON.stringify(this.notes));
-    }
-
-    // Theme methods
-    loadTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.setAttribute('data-theme', savedTheme);
-        } else {
-            // Default to dark theme if no preference is saved
-            document.body.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        }
-    }
-
-    toggleTheme() {
-        const currentTheme = document.body.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.body.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        this.updateThemeToggleButton();
-    }
-
-    updateThemeToggleButton() {
-        const toggleButton = this.app.querySelector('#theme-toggle');
-        const currentTheme = document.body.getAttribute('data-theme');
-        if (currentTheme === 'dark') {
-            toggleButton.innerHTML = '☀️'; // Sun icon for light mode
-        } else {
-            toggleButton.innerHTML = '🌙'; // Moon icon for dark mode
-        }
-    }
-
-    // Helper to get the week identifier (e.g., "YYYY-WW")
-    getWeekIdentifier(date) {
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        return `${d.getUTCFullYear()}-${weekNo < 10 ? '0' : ''}${weekNo}`;
-    }
-
-    // Helper to get the Saturday of the current week (Sunday-based week)
-    getSaturdayOfWeek(date) {
-        const d = new Date(date);
-        d.setHours(0, 0, 0, 0); // Normalize to the beginning of the current day in local time
-
-        const dayOfWeek = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-
-        // Calculate the date of the Sunday of the current week
-        const sunday = new Date(d);
-        sunday.setDate(d.getDate() - dayOfWeek);
-
-        // Calculate the date of the Saturday of the current week
-        const saturday = new Date(sunday);
-        saturday.setDate(sunday.getDate() + 6);
-
-        // Return YYYY-MM-DD string using local date components to avoid timezone shift
-        const year = saturday.getFullYear();
-        const month = (saturday.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
-        const day = saturday.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // Lotto methods
-    generateLottoNumbers() {
-        const lottoResults = [];
-        for (let i = 0; i < 5; i++) { // Generate 5 sets
-            const numbers = new Set();
-            while (numbers.size < 6) {
-                numbers.add(Math.floor(Math.random() * 45) + 1);
-            }
-            lottoResults.push(Array.from(numbers).sort((a, b) => a - b));
-        }
-
-        const lottoNoteString = "이번 주 로또 번호:\n" + lottoResults.map(set => set.join(', ')).join('\n');
-        alert(lottoNoteString); // Display immediately
-
-        // Save to upcoming Saturday
-        const upcomingSaturdayDateString = this.getSaturdayOfWeek(new Date()); // Use the new helper
-        this.notes[upcomingSaturdayDateString] = lottoNoteString;
-        this.saveNotesToStorage();
-
-        // Mark as generated for the current week
-        const currentWeekIdentifier = this.getWeekIdentifier(new Date());
-        localStorage.setItem('lotto-generated-week', currentWeekIdentifier);
-        this.lastLottoGeneratedWeek = currentWeekIdentifier; // Update instance variable
-
-        // Update UI
-        this.renderCalendarGrid();
-        this.updateLottoButtonState(); // Disable for rest of the week
-    }
-
-    updateLottoButtonState() {
-        const lottoButton = this.app.querySelector('#lotto-generator-button');
-        const currentWeekIdentifier = this.getWeekIdentifier(new Date());
-
-        if (currentWeekIdentifier === this.lastLottoGeneratedWeek) {
-            lottoButton.disabled = true;
-            lottoButton.title = "금주 로또 번호는 이미 생성되었습니다.";
-        } else {
-            lottoButton.disabled = false;
-            lottoButton.title = "로또 번호를 생성하세요!";
-        }
-    }
+function getRandomElement(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new TodoCalendar('#app');
+function convertToPrincessSpeak(text) {
+    if (!text.trim()) {
+        return "평범한 말을 적어주세요! 공주가 기다리고 있답니다 🥹";
+    }
+
+    let result = text;
+
+    // 1. Pronoun Replacement
+    for (const [key, value] of Object.entries(PRONOUN_MAP)) {
+        // Use regex with word boundaries to avoid partial matches
+        const regex = new RegExp(`\b${key}\b`, 'g');
+        result = result.replace(regex, value);
+    }
+
+    // 2. Exaggerated Phrases & Emojis
+    // Split by sentence-ending punctuation (., ?, !)
+    const sentences = result.split(/([.!?]+)/);
+    let princessSentences = [];
+
+    for (let i = 0; i < sentences.length; i++) {
+        let sentence = sentences[i].trim();
+        if (sentence === '' || sentences[i].match(/^[.!?]+$/)) { // Handle empty strings and just punctuation
+            princessSentences.push(sentences[i]);
+            continue;
+        }
+
+        // Add exaggerated phrase randomly
+        if (Math.random() < 0.3) { // 30% chance
+            sentence = getRandomElement(EXAGGERATED_PHRASES) + ' ' + sentence;
+        }
+
+        // Add emoji to sentence end
+        if (sentences[i+1] && sentences[i+1].match(/^[.!?]+$/)) { // Check if the next element is punctuation
+            sentence += getRandomElement(EMOJIS);
+        } else if (!sentences[i+1]) { // End of text and no punctuation followed
+             sentence += getRandomElement(EMOJIS);
+        }
+        
+        princessSentences.push(sentence);
+    }
+
+    result = princessSentences.join('');
+    
+    // 3. Add random emojis more aggressively to the end of the text
+    if (Math.random() < 0.5) { // 50% chance for more emojis at the very end
+        result += ' ' + Array.from({length: Math.floor(Math.random() * 3) + 1}, () => getRandomElement(EMOJIS)).join('');
+    }
+
+    return result.trim();
+}
+
+// Event Listeners
+translateButton.addEventListener('click', () => {
+    const input = inputText.value;
+    translateButton.disabled = true;
+    translateButton.textContent = '공주가 생각 중이에요... ✨'; // Loading state
+    
+    // Simulate processing time for better UX
+    setTimeout(() => {
+        resultText.textContent = convertToPrincessSpeak(input);
+        translateButton.disabled = false;
+        translateButton.textContent = '✨ 공주로 만들어줘 ✨';
+    }, 800);
 });
+
+copyButton.addEventListener('click', async () => {
+    const textToCopy = resultText.textContent;
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        showToast('공주어 복사 완료 👑');
+    } catch (err) {
+        console.error('Failed to copy text:', err);
+        alert('복사에 실패했습니다 🥹');
+    }
+});
+
+inputText.addEventListener('input', () => {
+    translateButton.disabled = inputText.value.trim() === '';
+});
+
+// Initial state
+translateButton.disabled = true; // Disable until input is provided
+
+function showToast(message) {
+    toastMessage.textContent = message;
+    toastMessage.classList.add('show');
+    setTimeout(() => {
+        toastMessage.classList.remove('show');
+    }, 3000); // Hide after 3 seconds
+}
