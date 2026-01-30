@@ -302,9 +302,23 @@ class TodoCalendar {
     // Helper to get the Saturday of the current week (Sunday-based week)
     getSaturdayOfWeek(date) {
         const d = new Date(date);
-        d.setDate(d.getDate() - d.getDay()); // Go back to Sunday of the current week
-        d.setDate(d.getDate() + 6); // Move forward to Saturday
-        return d.toISOString().split('T')[0]; // Return YYYY-MM-DD string
+        d.setHours(0, 0, 0, 0); // Normalize to the beginning of the current day in local time
+
+        const dayOfWeek = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+        // Calculate the date of the Sunday of the current week
+        const sunday = new Date(d);
+        sunday.setDate(d.getDate() - dayOfWeek);
+
+        // Calculate the date of the Saturday of the current week
+        const saturday = new Date(sunday);
+        saturday.setDate(sunday.getDate() + 6);
+
+        // Return YYYY-MM-DD string using local date components to avoid timezone shift
+        const year = saturday.getFullYear();
+        const month = (saturday.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+        const day = saturday.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     // Lotto methods
