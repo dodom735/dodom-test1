@@ -66,6 +66,7 @@ class TodoCalendar {
         this.currentDate = new Date();
         this.selectedDate = null;
         this.notes = this.loadNotes();
+        this.lastLottoGeneratedWeek = localStorage.getItem('lotto-generated-week'); // Initialize
         this.loadTheme(); // Load theme on initialization
         this.render();
     }
@@ -212,7 +213,7 @@ class TodoCalendar {
         const textarea = this.app.querySelector('#note-textarea');
         const modalTitle = this.app.querySelector('#modal-title');
 
-        modalTitle.textContent = new Date(this.selectedDate).toLocaleDateString('ko-KR', { // Changed to ko-KR
+        modalTitle.textContent = new Date(this.selectedDate).toLocaleDateString('ko-KR', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -289,6 +290,22 @@ class TodoCalendar {
         }
     }
 
+    // Helper to get the week identifier (e.g., "YYYY-WW")
+    getWeekIdentifier(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        return `${d.getUTCFullYear()}-${weekNo < 10 ? '0' : ''}${weekNo}`;
+    }
+
+    // Helper to get the upcoming Saturday of the current week
+    getUpcomingSaturday(date) {
+        const d = new Date(date);
+        d.setDate(d.getDate() + (6 - d.getDay() + 7) % 7); // 6 is Saturday
+        return d.toISOString().split('T')[0]; // Return YYYY-MM-DD string
+    }
+
     // Lotto methods
     generateLottoNumbers() {
         const lottoResults = [];
@@ -299,16 +316,35 @@ class TodoCalendar {
             }
             lottoResults.push(Array.from(numbers).sort((a, b) => a - b));
         }
-        alert("오늘의 로또 번호:\n" + lottoResults.map(set => set.join(', ')).join('\n'));
+
+        const lottoNoteString = "이번 주 로또 번호:\n" + lottoResults.map(set => set.join(', ')).join('\n');
+        alert(lottoNoteString); // Display immediately
+
+        // Save to upcoming Saturday
+        const upcomingSaturdayDateString = this.getUpcomingSaturday(new Date());
+        this.notes[upcomingSaturdayDateString] = lottoNoteString;
+        this.saveNotesToStorage();
+
+        // Mark as generated for the current week
+        const currentWeekIdentifier = this.getWeekIdentifier(new Date());
+        localStorage.setItem('lotto-generated-week', currentWeekIdentifier);
+        this.lastLottoGeneratedWeek = currentWeekIdentifier; // Update instance variable
+
+        // Update UI
+        this.renderCalendarGrid();
+        this.updateLottoButtonState(); // Disable for rest of the week
     }
 
     updateLottoButtonState() {
         const lottoButton = this.app.querySelector('#lotto-generator-button');
-        const currentDayOfWeek = this.currentDate.getDay(); // 0 for Sunday, 6 for Saturday
-        if (currentDayOfWeek === 6) { // If it's Saturday
-            lottoButton.disabled = false;
-        } else {
+        const currentWeekIdentifier = this.getWeekIdentifier(new Date());
+
+        if (currentWeekIdentifier === this.lastLottoGeneratedWeek) {
             lottoButton.disabled = true;
+            lottoButton.title = "금주 로또 번호는 이미 생성되었습니다.";
+        } else {
+            lottoButton.disabled = false;
+            lottoButton.title = "로또 번호를 생성하세요!";
         }
     }
 }
