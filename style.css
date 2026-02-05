@@ -7,7 +7,7 @@
     --text-color: #333333; /* Dark Grey Text */
     --border-color: #f8bbd0; /* Soft Pink Border */
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --hover-shadow-color: rgba(0, 0, 0, 0.2);
+    --hover-shadow-color: rgba(0,0,0,0.2);
     --border-radius-lg: 30px;
     --border-radius-md: 20px;
     --border-radius-sm: 10px;
@@ -236,4 +236,11 @@ h1 {
     #input-text {
         min-height: 100px;
     }
+}
+
+.info-text {
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    margin-top: 10px;
+    font-weight: bold;
 }
