@@ -12,7 +12,7 @@ const PRONOUN_MAP = {
 };
 
 const EXAGGERATED_PHRASES = [
-    '오늘도 공주는', '아가 공주는', '아가 토끼 공주는', '공주가 말하길,', '이 공주는', '놀랍게도, 공주는'
+    '오늘도 공주는', '아가 공주는', '아가 토끼 공주는', '공주가 말하길,', '이 공주는', '놀랍게도, 공주는', '천사 공주께서는', '귀여운 아가는'
 ];
 
 const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '🦄', '💫', '🌟', '🌷', '🦋', '🦢', '🌟']; // Increased density
@@ -98,11 +98,9 @@ function convertToPrincessSpeak(text) {
             continue;
         }
 
-        // Randomly insert an exaggerated phrase (higher chance)
-        if (Math.random() < 0.4) { // 40% chance
-            segment = getRandomElement(EXAGGERATED_PHRASES) + ' ' + segment;
-            exaggeratedPhraseCount++;
-        }
+        // Always insert an exaggerated phrase
+        segment = getRandomElement(EXAGGERATED_PHRASES) + ' ' + segment;
+        exaggeratedPhraseCount++;
 
         // Randomly insert emojis within the segment more aggressively
         // Split by word boundaries or whitespace to insert emojis effectively
