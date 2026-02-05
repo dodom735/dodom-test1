@@ -12,8 +12,7 @@ const PRONOUN_MAP = {
 };
 
 const EXAGGERATED_PHRASES = [
-    '공주는! 정말이지...', '공주는! 세상에!', '이 공주는! 어머나!', '맙소사! 공주는!', '공주가 말하길, 이게 무슨 일이죠?', '정말 곤란하답니다 🥹', '공주 심장이 콩닥콩닥!', '어떡하죠? 💖', '말도 안돼요! 공주는!', '공주는 행복하답니다 ✨',
-    '너무나도 황홀하답니다! 공주는!', '공주가 기절할 뻔했어요 🎀', '믿을 수가 없어요! 이 공주는!', '눈물이 핑 돈답니다 😭'
+    '오늘도 공주는', '아가 공주는', '아가 토끼 공주는', '공주가 말하길,', '이 공주는', '놀랍게도, 공주는'
 ];
 
 const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '🦄', '💫', '🌟', '🌷', '🦋', '🦢', '🌟']; // Increased density
@@ -113,11 +112,8 @@ function convertToPrincessSpeak(text) {
             tempSegment.push(wordsAndSpaces[j]);
             // Insert emoji after a non-whitespace word with higher probability
             if (wordsAndSpaces[j].trim() !== '' && Math.random() < 0.5) { // 50% chance after each non-empty word
-                const numEmojis = Math.floor(Math.random() * 2) + 1; // 1 or 2 emojis
-                for (let k = 0; k < numEmojis; k++) {
-                    tempSegment.push(getRandomElement(EMOJIS));
-                    emojiCount++;
-                }
+                tempSegment.push(getRandomElement(EMOJIS));
+                emojiCount++;
             }
         }
         segment = tempSegment.join('');
@@ -125,13 +121,6 @@ function convertToPrincessSpeak(text) {
         princessSegments.push(segment);
     }
     result = princessSegments.join('');
-    
-    // Add more random emojis to the very end for extra chaos
-    if (Math.random() < 0.9) { // 90% chance for more emojis at the very end
-        const extraEmojis = Array.from({length: Math.floor(Math.random() * 5) + 3}, () => getRandomElement(EMOJIS)).join(''); // 3 to 7 emojis
-        result += ' ' + extraEmojis;
-        emojiCount += (Math.floor(Math.random() * 5) + 3);
-    }
 
     // Store counts for Princess Power calculation
     return {
@@ -261,3 +250,16 @@ function showToast(message) {
         toastMessage.classList.remove('show');
     }, 3000); // Hide after 3 seconds
 }
+
+function updateTimestamp() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
+    document.getElementById('last-updated').textContent = `최신 업데이트: ${timestamp}`;
+}
+
+updateTimestamp();
