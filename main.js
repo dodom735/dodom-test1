@@ -9,7 +9,47 @@ const lastUpdatedDisplay = document.getElementById('last-updated');
 const powerFill = document.getElementById('power-fill');
 const resultCard = document.getElementById('result-card');
 
-// Function to update timestamp (re-added)
+// --- [1. 데이터 정의: 광기의 극대화] ---
+const PRONOUN_MAP = {
+    '나': '본 공주', '나는': '본 공주는', '내가': '본 공주가', '내': '본 공주의',
+    '저': '아기 공주', '저는': '아기 공주는', '제가': '아기 공주가', '저의': '아기 공주의'
+};
+
+const NOUN_MAP = {
+    '집': '장미 향기가 가득한 비밀 궁궐', '돈': '반짝이는 순금 다이아몬드', 
+    '밥': '천상의 맛을 담은 고귀한 만찬', '코딩': '찬란한 보석을 수놓는 바이브 코딩',
+    '사랑': '영원한 사랑의 빛줄기', '컴퓨터': '마법의 지혜가 담긴 거울'
+};
+
+const ADJECTIVES = ['눈부신', '황홀한', '사랑스러운', '고귀한', '은하수 같은', '장미빛', '찬란한', '영롱한'];
+const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '💫', '🌟', '🌷', '🦋', '🦢', '💄', '💍', '🦄'];
+
+const EXAGGERATED_PHRASES = [ // Re-added EXAGGERATED_PHRASES
+    '오호호! ✨ 아가 공주는', '천사 공주께서는', '눈부신 미모의 본 공주가 말하길,', '온 세상이 감탄할지니, 본 공주는'
+];
+
+const CONNECTIVES = ['하시옵고', '이옵나니', '하시매', '이옵고', '그러하시온데', '또한', '말씀드리옵나이다']; // Re-added CONNECTIVES
+
+// --- [2. 핵심 유틸리티] ---
+const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]; // Corrected name
+
+// 조사 교정 함수 (받침 유무에 따라 은/는, 이/가 등 자동 교정)
+function fixJosa(text) {
+    return text.replace(/([가-힣])(은\/는|이\/가|을\/를|와\/과|으로\/로)/g, (match, word, type) => {
+        const lastChar = word.charCodeAt(word.length - 1);
+        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
+        const josaMap = {
+            '은/는': hasBatchim ? '은' : '는',
+            '이/가': hasBatchim ? '이' : '가',
+            '을/를': hasBatchim ? '을' : '를',
+            '와/과': hasBatchim ? '과' : '와',
+            '으로/로': (lastChar - 0xac00) % 28 === 8 ? '로' : (hasBatchim ? '으로' : '로')
+        };
+        return word + josaMap[type];
+    });
+}
+
+// Function to update timestamp
 function updateTimestamp() {
     const now = new Date();
     const year = now.getFullYear();
@@ -18,7 +58,7 @@ function updateTimestamp() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const timestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
-    if (lastUpdatedDisplay) { // Check if element exists before updating
+    if (lastUpdatedDisplay) {
         lastUpdatedDisplay.textContent = `최신 업데이트: ${timestamp}`;
     }
 }
@@ -28,7 +68,6 @@ function generateSparkles(containerId, count) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Clear existing sparkles to avoid accumulation on re-render if any
     container.innerHTML = ''; 
 
     for (let i = 0; i < count; i++) {
@@ -36,10 +75,10 @@ function generateSparkles(containerId, count) {
         sparkle.classList.add('sparkle');
         sparkle.style.top = `${Math.random() * 100}%`;
         sparkle.style.left = `${Math.random() * 100}%`;
-        sparkle.style.width = `${Math.random() * 5 + 3}px`; // 3-8px
+        sparkle.style.width = `${Math.random() * 5 + 3}px`;
         sparkle.style.height = sparkle.style.width;
         sparkle.style.animationDelay = `${Math.random() * 2}s`;
-        sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`; // 0.5-1.5s
+        sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
         container.appendChild(sparkle);
     }
 }
@@ -69,7 +108,7 @@ function convertToPrincessSpeak(text) {
     let words = result.split(/\s+/);
     let decoratedWords = words.map(word => {
         let dec = word;
-        if (Math.random() < 0.4) dec = getRandom(ADJECTIVES) + " " + dec; // 형용사 추가
+        if (word.length > 1 && Math.random() < 0.4) dec = getRandom(ADJECTIVES) + " " + dec; // 형용사 추가
         dec += getRandom(EMOJIS); // 단어 끝에 이모지 무조건 하나
         if (Math.random() < 0.7) dec += getRandom(EMOJIS); // 70% 확률로 하나 더
         return dec;
@@ -79,7 +118,7 @@ function convertToPrincessSpeak(text) {
 
     // 3. 문장 전체를 하나의 흐름으로 통합 (가장 중요한 부분!)
     // 문장을 쪼개지 않고, 맨 앞과 맨 뒤에만 임팩트를 주어 매끄럽게 만듭니다.
-    const prefix = "오호호! ✨ 존귀하신 본 공주가 읊조리길, ";
+    const prefix = getRandom(EXAGGERATED_PHRASES) + " "; // Use getRandom here
     let suffix = "";
 
     // 질문인지 평서문인지 판단하여 어미 결정
@@ -109,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => { // DOMContentLoaded를 사
         translateButton.addEventListener('click', () => {
             const input = inputText.value;
             translateButton.disabled = true;
-            translateButton.querySelector('.btn-text').textContent = '아가 공주가 품격을 올리는 중... ✨'; // Update text inside span
+            translateButton.querySelector('.btn-text').textContent = '아가 공주가 품격을 올리는 중... ✨'; // 버튼 텍스트 변경
 
             setTimeout(() => {
                 const result = convertToPrincessSpeak(input);
@@ -124,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => { // DOMContentLoaded를 사
                 if (resultCard) resultCard.classList.remove('hidden'); // Show result card
 
                 translateButton.disabled = false;
-                translateButton.querySelector('.btn-text').textContent = '품격 올리기'; // Update text inside span
+                translateButton.querySelector('.btn-text').textContent = '품격 올리기'; // 버튼 텍스트 변경
             }, 600);
         });
     }
@@ -159,20 +198,5 @@ function showToast(msg) {
         toastMessage.textContent = msg;
         toastMessage.classList.add('show');
         setTimeout(() => toastMessage.classList.remove('show'), 2000);
-    }
-}
-
-// updateTimestamp 함수가 전역 스코프에 없었을 경우를 대비하여 DOMContentLoaded 밖에서 정의
-function updateTimestamp() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const timestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
-    // lastUpdatedDisplay가 null일 경우를 대비하여 추가 확인
-    if (lastUpdatedDisplay) {
-        lastUpdatedDisplay.textContent = `최신 업데이트: ${timestamp}`;
     }
 }
