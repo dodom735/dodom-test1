@@ -18,7 +18,15 @@ body {
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     cursor: url('https://cur.cursors-4u.net/symbols/sym-1/sym49.cur'), auto; /* 요술봉 커서(선택사항) */
-    overflow-x: hidden;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+
+    /* 스크롤 최소화 및 중앙 정렬 최적화 - 사용자 요청 */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 상단부터 배치 */
+    padding: 20px;
+    overflow-y: auto; /* 필요할 때만 스크롤 */
 }
 
 @keyframes gradientBG {
@@ -27,11 +35,18 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* 3. 배경 공주 캐릭터의 광기 (회전 및 확대) */
+/* 배경 캐릭터 크기 조절: 콘텐츠를 가리지 않게 최적화 */
 body::before {
+    font-size: 30em; /* 크기 축소 */
+    top: 40%;
+    opacity: 0.05;
+    /* 기존 스타일 유지 */
     content: '👸';
-    font-size: 60em;
-    opacity: 0.07;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    pointer-events: none;
     animation: rotatePulse 20s infinite linear;
 }
 
@@ -45,38 +60,61 @@ body::before {
 #app-container {
     border: 10px double var(--gold-color); /* 이중 황금 테두리 */
     box-shadow: var(--princess-shadow), inset 0 0 15px rgba(255, 215, 0, 0.3);
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.85);
+    /* 사용자 요청 스타일 */
+    margin: 0 auto;
+    padding: 30px;
+    max-width: 800px; /* 더 넓게 확장 */
+    width: 95%;
+    gap: 15px; /* 요소 간 간격 좁힘 */
+    margin-top: 10px; /* 상단 밀착 */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px); /* 현대적인 유리 느낌 */
+    /* 기존 스타일 유지 */
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 10px; /* 사용자 요청 */
 }
 
 h1 {
     font-family: 'Parisienne', cursive; /* 화려한 필기체 */
-    font-size: 4.5em;
+    font-size: 2.8em; /* 크기 적정화 - 사용자 요청 */
     background: linear-gradient(to right, #ff1493, #ffd700, #ff1493);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: glitter 2s linear infinite;
+    margin: 0; /* 사용자 요청 */
 }
 
-@keyframes glitter {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
+/* 텍스트 박스: 더 넓고 편안한 UI */
+#input-text {
+    width: 100%;
+    min-height: 180px; /* 높이 대폭 확장 */
+    padding: 20px;
+    font-size: 1.2em;
+    border: 2px solid #f8bbd0;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.1);
+    box-sizing: border-box; /* 패딩이 너비에 포함되게 */
+    /* 기존 스타일 유지 */
+    resize: vertical;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-/* 5. 결과창 - '진짜 액자' 느낌 극대화 */
-#result-text {
-    font-size: 1.3em;
-    font-weight: 700;
-    line-height: 1.8;
-    color: #4b0082;
-    padding: 25px;
-    border: 8px ridge var(--gold-color); /* 입체감 있는 액자 테두리 */
-    background: white;
-    box-shadow: 10px 10px 0px var(--border-color); /* 복고풍 그림자 */
-    position: relative;
+#input-text:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(var(--primary-color), 0.2);
 }
 
-/* 6. 버튼 - 광기 어린 반짝임 효과 */
 .btn-primary {
     position: relative;
     overflow: hidden;
@@ -136,85 +174,61 @@ h1 {
     animation: rainbow 5s ease infinite;
 }
 
+/* 추가된 스타일 */
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 기존 15px에서 변경 */
+}
+
+label {
+    font-family: 'Gowun Batang', serif;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.sub-label {
+    font-size: 0.8em;
+    color: #888;
+    font-weight: normal;
+}
+
+/* 결과 섹션: 상단으로 더 붙임 - 사용자 요청 */
+.result-section {
+    margin-top: 10px;
+    position: relative;
+}
+
 /* Additional styling for the result-card when it is not hidden */
 #result-card:not(.hidden) {
     display: flex; /* Ensure it's displayed when not hidden */
     flex-direction: column;
     gap: 15px;
-    padding: 20px;
+    padding: 25px; /* 사용자 요청 */
     border-radius: 15px;
     background-color: var(--surface-color); /* Default background */
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: 4px double #ffd700; /* 황금 액자 디테일 유지 - 사용자 요청 */
 }
 
 .hidden {
     display: none !important;
 }
 
-.status-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background-color: #fce4ec; /* Light pink background */
-    padding: 10px 15px;
-    border-radius: 10px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.title-badge {
-    font-family: 'Dancing Script', cursive;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: var(--primary-color);
-    flex-grow: 1; /* Allow title to take available space */
-    text-align: left;
-}
-
-.power-track {
-    width: 100px;
-    height: 10px;
-    background-color: #ffe0e6;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.power-fill {
-    height: 100%;
-    width: 0%; /* Initial width */
-    background-image: linear-gradient(to right, #ffafbd, #ffc3a0); /* Pink-gold gradient */
-    border-radius: 5px;
-    transition: width 0.5s ease-out;
-}
-
-.power-num {
-    font-family: 'Gowun Batang', serif;
-    font-size: 0.9em;
-    font-weight: bold;
-    color: var(--secondary-color);
-}
-
-.result-box {
-    background-color: white;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #f8bbd0;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.critique-text {
-    font-family: 'Gowun Batang', serif;
-    font-size: 0.9em;
-    color: #666;
-    font-style: italic;
-    margin-top: 10px;
-}
-
-.action-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+/* 5. 결과창 - '진짜 액자' 느낌 극대화 */
+#result-text {
+    font-size: 1.4em; /* 사용자 요청 */
+    font-weight: 700;
+    line-height: 1.8;
+    color: #4b0082;
+    padding: 0; /* 패딩은 result-box에서 관리 */
+    border: none; /* border는 result-card에서 관리 */
+    background: transparent;
+    box-shadow: none;
+    position: relative;
 }
 
 .royal-timestamp {
@@ -222,7 +236,7 @@ h1 {
     font-size: 0.8em;
     color: #999;
     text-align: right;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* 사용자 요청 */
 }
 
 /* Responsive adjustments */
@@ -241,4 +255,68 @@ h1 {
     #input-text {
         min-height: 100px;
     }
+}
+.result-box {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #f8bbd0;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: #fce4ec; /* Light pink background */
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.power-track {
+    width: 100px;
+    height: 10px;
+    background-color: #ffe0e6;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.power-fill {
+    height: 100%;
+    width: 0%; /* Initial width */
+    background: linear-gradient(to right, #ff69b4, #8a2be2); /* Pink-gold gradient - 사용자 요청*/
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.power-num {
+    font-family: 'Gowun Batang', serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+.title-badge {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--primary-color);
+    flex-grow: 1; /* Allow title to take available space */
+    text-align: left;
+}
+
+.critique-text {
+    font-family: 'Gowun Batang', serif;
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.action-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }

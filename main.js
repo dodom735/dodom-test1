@@ -87,10 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
         input: document.getElementById('input-text'),
         btn: document.getElementById('translate-button'),
         card: document.getElementById('result-card'),
-        text: document.getElementById('result-text'),
-        power: document.getElementById('princess-power'),
-        fill: document.getElementById('power-fill'),
-        title: document.getElementById('princess-title'),
+        text: document.getElementById('result-text'), // This is back to having an ID
+        power: document.getElementById('princess-power'), // This is back to having an ID
+        fill: document.getElementById('power-fill'), // This is back to having an ID
+        title: document.getElementById('princess-title'), // This is back to having an ID
         copy: document.getElementById('copy-button')
     };
 

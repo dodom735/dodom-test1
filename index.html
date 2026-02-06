@@ -16,42 +16,33 @@
     <div class="background-character">👸</div>
 
     <div id="app-container">
-        <div id="last-updated" class="royal-timestamp"></div>
-
+        <div id="last-updated" style="text-align: right; color: #ffb6c1; font-size: 0.7em; margin-bottom: 5px;"></div>
+        
         <header>
-            <div class="badge">Royal Identity Verification</div>
-            <h1>Princess <span class="highlight">Lab</span> 👑</h1>
-            <p class="tagline">"천박한 말투는 이제 그만, 당신의 품격을 7성급으로 승격시키세요." ✨</p>
+            <h1>Princess Lab 👑</h1>
+            <p class="tagline">"평민의 언어를 하사하면 본 공주가 심사하겠노라." ✨</p>
         </header>
 
         <main>
             <div class="input-section">
-                <label for="input-text">평민의 언어 입력 <span class="sub-label">| Standard Korean</span></label>
-                <textarea id="input-text" placeholder="예: 오늘 점심 뭐 먹지? (공주님은 고민 따위 하지 않으십니다 👀)"></textarea>
-                
-                <button id="translate-button" class="btn-primary">
+                <label style="display: block; text-align: left; margin-left: 10px; color: #ff69b4; font-weight: bold; font-size: 0.9em;">평민의 언어 입력</label>
+                <textarea id="input-text" placeholder="예: 오늘 코딩 너무 즐겁다! (고귀하게 적어보세요 🦢)"></textarea>
+                <button id="translate-button" class="btn-primary" style="width: 100%; margin-top: 10px;">
                     <span class="btn-text">✨ 공주어로 승격하기 ✨</span>
                 </button>
             </div>
 
             <div class="result-section">
                 <div id="result-card" class="card hidden">
-                    <div class="status-bar">
-                        <span id="princess-title" class="title-badge">심사 중...</span>
-                        <div class="power-track">
-                            <div id="power-fill" class="power-fill"></div>
-                        </div>
-                        <span id="princess-power" class="power-num">0%</span>
+                    <div id="princess-status" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span id="princess-title" style="background: #ff69b4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8em;">심사 대기 중</span>
+                        <span id="princess-power" style="color: #ff69b4; font-weight: bold;">0%</span>
                     </div>
-
-                    <div class="result-box">
-                        <p id="result-text">본 공주의 고귀한 말씀이 여기에 하사될 것이옵니다... 💖</p>
+                    <div style="width: 100%; height: 8px; background: #ffe4e6; border-radius: 4px; margin-bottom: 20px;">
+                        <div id="power-fill" style="width: 0%; height: 100%; background: linear-gradient(to right, #ff69b4, #8a2be2); border-radius: 4px; transition: width 1s ease-out;"></div>
                     </div>
-
-                    <div class="action-group">
-                        <p class="critique-text">"공주력이 부족하면 입궁이 거절될 수 있습니다 💅"</p>
-                        <button id="copy-button" class="btn-icon">📋 하사받은 문장 복사하기</button>
-                    </div>
+                    <p id="result-text" style="font-size: 1.4em; color: #4b0082;">번역된 공주어가 여기에 하사됩니다... 🌸</p>
+                    <button id="copy-button" class="btn-icon" style="width: 100%; margin-top: 20px;">📋 복사하기</button>
                 </div>
             </div>
         </main>
