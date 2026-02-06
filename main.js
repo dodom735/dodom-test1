@@ -3,7 +3,6 @@ const translateButton = document.getElementById('translate-button');
 const resultText = document.getElementById('result-text');
 const copyButton = document.getElementById('copy-button');
 const toastMessage = document.getElementById('toast-message');
-const princessPowerDisplay = document.getElementById('princess-power');
 const princessTitleDisplay = document.getElementById('princess-title');
 const lastUpdatedDisplay = document.getElementById('last-updated'); // Re-added display element
 
