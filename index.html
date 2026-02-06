@@ -3,57 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 공주어 트랜스레이터 👑</title>
+    <title>본 공주가 직접 심사하노라: 7성급 로열 공주력 Lab ✨</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Parisienne&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="sparkle-container">
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-        <div class="sparkle"></div>
-    </div>
+<body class="overflow-x-hidden">
+    <div class="sparkle-container" id="sparkle-layer"></div>
+    <div class="background-character">👸</div>
+
     <div id="app-container">
-        <div id="last-updated" style="text-align: right; color: grey; font-size: 0.8em;"></div>
+        <div id="last-updated" class="royal-timestamp"></div>
+
         <header>
-            <h1>공주어 트랜스레이터 👑</h1>
-            <p class="tagline">말은 평범했는데... 공주가 되어버렸습니다 ✨</p>
+            <div class="badge">Royal Identity Verification</div>
+            <h1>Princess <span class="highlight">Lab</span> 👑</h1>
+            <p class="tagline">"천박한 말투는 이제 그만, 당신의 품격을 7성급으로 승격시키세요." ✨</p>
         </header>
 
         <main>
             <div class="input-section">
-                <textarea id="input-text" placeholder="평범한 말을 적으세요 👀"></textarea>
-                <button id="translate-button" class="btn-primary">✨ 공주로 만들어줘 ✨</button>
+                <label for="input-text">평민의 언어 입력 <span class="sub-label">| Standard Korean</span></label>
+                <textarea id="input-text" placeholder="예: 오늘 점심 뭐 먹지? (공주님은 고민 따위 하지 않으십니다 👀)"></textarea>
+                
+                <button id="translate-button" class="btn-primary">
+                    <span class="btn-text">✨ 공주어로 승격하기 ✨</span>
+                </button>
             </div>
 
             <div class="result-section">
-                <div id="result-card" class="card">
-                    <p id="result-text">변환된 공주어가 여기에 나타날 거예요! 💖</p>
-                    <p id="princess-power" class="info-text">공주력: 0%</p> <!-- New element -->
-                    <p id="princess-title" class="info-text">칭호: (평범한 백성)</p> <!-- New element -->
-                    <button id="copy-button" class="btn-icon">📋 복사하기</button>
+                <div id="result-card" class="card hidden">
+                    <div class="status-bar">
+                        <span id="princess-title" class="title-badge">심사 중...</span>
+                        <div class="power-track">
+                            <div id="power-fill" class="power-fill"></div>
+                        </div>
+                        <span id="princess-power" class="power-num">0%</span>
+                    </div>
+
+                    <div class="result-box">
+                        <p id="result-text">본 공주의 고귀한 말씀이 여기에 하사될 것이옵니다... 💖</p>
+                    </div>
+
+                    <div class="action-group">
+                        <p class="critique-text">"공주력이 부족하면 입궁이 거절될 수 있습니다 💅"</p>
+                        <button id="copy-button" class="btn-icon">📋 하사받은 문장 복사하기</button>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
     <div id="toast-message" class="toast"></div>
+
+    <!-- '뾰로롱' 효과음 추가. 오디오 파일(예: sparkle.mp3)은 'audio' 폴더에 넣어주세요. -->
+    <audio id="sparkle-sound" src="audio/sparkle.mp3" preload="auto"></audio>
 
     <script src="main.js"></script>
 </body>
