@@ -107,8 +107,31 @@ const SENTENCE_END_DECORATIONS = [
     '이옵니다, 감히 거절할 수 없사옵니다 🧚‍♀️', '이옵니다, 공주님의 말씀이시옵니다 🦄', '이옵니다, 총총 🌟', '이옵니다, 총총 🌷', '이옵니다, 총총 🦋'
 ];
 
+const SENTENCE_END_TRANSFORMATIONS = [
+    // Interrogative (prioritize specific questions)
+    { regex: /는\s+것이\s+맞나\s*[\?!]*$/, replacement: '는 것이 참말로 옳사옵니까? 오호호, 그리 여쭈옵니다! ✨', type: 'interrogative' }, // "맞나?" specific
+    { regex: /게\s+맞나\s*[\?!]*$/, replacement: '것이 참으로 옳사옵니까? 💖', type: 'interrogative' }, // "괜찮은게 맞나?"
+    { regex: /(이|가)\s+맞나\s*[\?!]*$/, replacement: '$1 참으로 옳사옵니까? 👑', type: 'interrogative' }, // "이게 맞나?"
+    { regex: /(입니까|습니까|ㅂ니까)\s*[\?!]*$/, replacement: '$1? 아가가 궁금하옵니다 🥹', type: 'interrogative' },
+    { regex: /(나요|가요|인가요|하나요)\s*[\?!]*$/, replacement: '하옵니까? 🎀', type: 'interrogative' },
+    { regex: /(할까|일까|을까|ㄹ까)\s*[\?!]*$/, replacement: '$1 하옵니까? 🌸', type: 'interrogative' },
+    { regex: /(어때|하니|하니깐|니)\s*[\?!]*$/, replacement: '하시옵니까? 💎', type: 'interrogative' }, // Informal questions
+    { regex: /(뭐|누구|언제|어디|어떻게|왜)\s*[\?!]*$/, replacement: '$1이옵니까? 🦄', type: 'interrogative' }, // Wh-questions
+    { regex: /([.?!])\s*$/, replacement: '이옵니까? ✨', type: 'interrogative', fallback: true }, // Generic question ending
+
+    // Declarative/Propositive/Imperative
+    { regex: /(습니다|ㅂ니다|하옵니다)\s*[\.!]*$/, replacement: '하옵니다, 이 공주가 말씀드리옵니다 💖', type: 'declarative' },
+    { regex: /(아요|어요|지요|죠)\s*[\.!]*$/, replacement: '이옵니다, 그리 생각하옵니다 👑', type: 'declarative' },
+    { regex: /(할게|갈게|을게|ㄹ게)\s*[\.!]*$/, replacement: '$1 이옵니다, 소인이 그리 하겠사옵니다 💫', type: 'declarative' },
+    { regex: /(하자|가자|을까|ㄹ까)\s*[\.!]*$/, replacement: '$1 하옵시다, 어서 서두르시옵소서 🌷', type: 'propositive' },
+    { regex: /(해라|거라|아라|어라)\s*[\.!]*$/, replacement: '하시옵소서, 이 공주가 명하옵니다 🦋', type: 'imperative' },
+    { regex: /(할게|할게요|갈게요)\s*[\.!]*$/, replacement: '하겠사옵니다, 부디 허락하시옵소서! 🧚‍♀️', type: 'declarative' },
+    { regex: /(이다|야|어|군|네|네)\s*[\.!]*$/, replacement: '이옵니다, 그리 알고 계시옵소서! 🌟', type: 'declarative', fallback: true }, // Informal declarative
+    { regex: /([.?!])\s*$/, replacement: '이옵니다, 오호호! ✨', type: 'declarative', fallback: true }, // Generic declarative ending
+];
+
 // Helper function for Korean particle adjustment (은/는, 이/가, 을/를, 에/에게, 와/과, 로/으로)
-function adjustParticle(word, particleType) {
+function getJosa(word, particleType) {
     if (!word || typeof word !== 'string') return '';
     const lastChar = word.charCodeAt(word.length - 1);
     // Check for final consonant (받침)
@@ -164,7 +187,8 @@ function convertToPrincessSpeak(text) {
     // 1. Advanced Noun Replacement (Prioritize longer matches)
     const nounKeys = Object.keys(NOUN_MAP).sort((a, b) => b.length - a.length);
     for (const key of nounKeys) {
-        const regex = new RegExp(`\\b${key}\\b`, 'g'); // Whole word match
+        // Use a more robust word boundary for Korean, matching any non-Korean character or whitespace
+        const regex = new RegExp(`(?<=\\s|^)${key}(?=\\s|$)`, 'g');
         result = result.replace(regex, (match) => {
             return NOUN_MAP[key];
         });
@@ -174,9 +198,7 @@ function convertToPrincessSpeak(text) {
     const pronounKeys = Object.keys(PRONOUN_MAP).sort((a, b) => b.length - a.length); // Process longer words first
 
     for (const key of pronounKeys) {
-        // Lookbehind (?<=^|\s) for start of string or whitespace
-        // Lookahead (?=\s|$) for whitespace or end of string
-        const regex = new RegExp(`(?<=^|\\s)${key}(?=\\s|$)`, 'g');
+        const regex = new RegExp(`(?<=\\s|^)${key}(?=\\s|$)`, 'g');
         result = result.replace(regex, (match) => {
             pronounCount++;
             return PRONOUN_MAP[key];
@@ -184,110 +206,104 @@ function convertToPrincessSpeak(text) {
     }
 
     // 3. Sentence Segmentation and Processing
-    const segments = result.split(/([.!?]+|\n)/g); // Split by punctuation or newline, keeping delimiters
-    let princessSegments = [];
+    // Split by punctuation, newlines, or a general sentence-ending pattern for more robust segmentation
+    const sentenceDelimiters = /([.!?]+|\n)/g;
+    const sentences = result.split(sentenceDelimiters).filter(s => s.trim() !== ''); // Filter out empty strings from split
 
-    for (let i = 0; i < segments.length; i++) {
-        let segment = segments[i];
-        if (!segment.trim()) {
-            princessSegments.push(segment);
-            continue;
+    let princessSentences = [];
+
+    for (let i = 0; i < sentences.length; i++) {
+        let sentence = sentences[i];
+        let currentPunctuation = '';
+
+        // Extract trailing punctuation if any, and handle it separately
+        const trailingPunctuationMatch = sentence.match(/([.!?]+)$/);
+        if (trailingPunctuationMatch) {
+            currentPunctuation = trailingPunctuationMatch[0];
+            sentence = sentence.slice(0, -currentPunctuation.length);
         }
 
-        // If it's just punctuation or newline, append it as is
-        if (segment.match(/^[.!?]+$/) || segment.match(/^\n$/)) {
-            princessSegments.push(segment);
-            continue;
-        }
+        // Apply unique exaggerated phrase at the beginning of each sentence
+        sentence = getRandomElement(EXAGGERATED_PHRASES) + ' ' + sentence;
+        exaggeratedPhraseCount++;
 
-        let processedSegment = segment;
-
-        // Insert exaggerated phrases more aggressively for length
-        if (Math.random() < 0.7) { // 70% chance to add an exaggerated phrase at the start
-            processedSegment = getRandomElement(EXAGGERATED_PHRASES) + ' ' + processedSegment;
-            exaggeratedPhraseCount++;
-        }
-        if (Math.random() < 0.3) { // 30% chance to add another one in the middle
-            const words = processedSegment.split(' ');
-            if (words.length > 3) {
-                const mid = Math.floor(words.length / 2);
-                words.splice(mid, 0, getRandomElement(EXAGGERATED_PHRASES));
-                processedSegment = words.join(' ');
-                exaggeratedPhraseCount++;
+        // Randomly insert interjections
+        if (Math.random() < 0.3) { // Reduced frequency
+            const words = sentence.split(' ');
+            if (words.length > 2) {
+                const insertIndex = Math.floor(Math.random() * (words.length - 1)) + 1;
+                words.splice(insertIndex, 0, getRandomElement(INTERJECTIONS));
+                sentence = words.join(' ');
             }
         }
 
-        // Randomly insert interjections
-        if (Math.random() < 0.6) {
-            processedSegment = processedSegment.replace(/(\s)/, `$1${getRandomElement(INTERJECTIONS)} `);
-        }
-        if (Math.random() < 0.4) {
-            processedSegment = processedSegment + ' ' + getRandomElement(INTERJECTIONS);
-        }
-
-        // Aggressively insert emojis throughout the segment
-        const wordsAndSpaces = processedSegment.split(/(\s+)/);
+        // Aggressively insert emojis throughout the segment (reduced density)
+        const wordsAndSpaces = sentence.split(/(\s+)/);
         let tempSegment = [];
         for (let j = 0; j < wordsAndSpaces.length; j++) {
             tempSegment.push(wordsAndSpaces[j]);
-            if (wordsAndSpaces[j].trim() !== '' && Math.random() < 0.6) { // 60% chance after each non-empty word
+            if (wordsAndSpaces[j].trim() !== '' && Math.random() < 0.2) { // 20% chance after each non-empty word
                 tempSegment.push(getRandomElement(EMOJIS));
                 emojiCount++;
             }
         }
-        processedSegment = tempSegment.join('');
+        sentence = tempSegment.join('');
 
-        // Apply archaic suffixes and particle adjustment
-        // This is a simplified approach; a more robust NLP solution would be needed for perfect grammar.
-        const wordsInSegment = processedSegment.split(' ');
-        let lastWord = wordsInSegment[wordsInSegment.length - 1];
-
-        if (lastWord) {
-            // Attempt to adjust particles for common cases like verbs/adjectives followed by basic particles
-            // This part is very challenging without proper Korean NLP.
-            // For now, we'll try to append archaic suffixes to the last "meaningful" part.
-            // Simplified: just append an archaic suffix to the end if it doesn't already end with a particle.
-            const lastChar = lastWord.charAt(lastWord.length - 1);
-            if (!['은', '는', '이', '가', '을', '를', '도', '만'].includes(lastChar) && Math.random() < 0.7) {
-                processedSegment += getRandomElement(ARCHAIC_SUFFIXES);
+        // 4. Sentence Ending Transformation (Core Logic: Replace original ending)
+        let transformedEnding = false;
+        for (const endingRule of SENTENCE_END_TRANSFORMATIONS) {
+            // Match from the end of the sentence content, before any extracted punctuation
+            if (endingRule.regex.test(sentence)) {
+                sentence = sentence.replace(endingRule.regex, endingRule.replacement);
+                transformedEnding = true;
+                break; // Apply only the first matching rule
             }
         }
 
-        // Ensure every sentence ends with a lavish decoration
-        if (!processedSegment.match(/[.!?]$/)) { // If it doesn't end with punctuation
-            processedSegment += getRandomElement(SENTENCE_END_DECORATIONS);
-            emojiCount += 2; // Decorations often have emojis
+        // Fallback for sentences that didn't match any specific ending rule,
+        // or if the original ending was too abrupt/informal.
+        if (!transformedEnding) {
+            // Append a generic elaborate ending if no specific rule applied
+            // Use the most suitable decoration based on original punctuation (if any) or a default
+            const genericEnding = getRandomElement(SENTENCE_END_DECORATIONS);
+            sentence += ' ' + genericEnding;
+            emojiCount += 2;
             exaggeratedPhraseCount++;
-        } else {
-             // If it does end with punctuation, append decoration before the punctuation
-            const lastPunctuation = processedSegment.match(/([.!?]+)$/);
-            if (lastPunctuation) {
-                processedSegment = processedSegment.slice(0, -lastPunctuation[0].length) + ' ' + getRandomElement(SENTENCE_END_DECORATIONS) + lastPunctuation[0];
-                emojiCount += 2;
-                exaggeratedPhraseCount++;
-            }
         }
 
-        // Apply particle adjustments to words within the segment, if applicable (best effort)
-        // This is a complex task for a simple regex-based system.
-        // I will do a very basic replacement for common patterns.
-        processedSegment = processedSegment.replace(/(\w+)(은\/는)/g, (match, p1, p2) => p1 + adjustParticle(p1, p2));
-        processedSegment = processedSegment.replace(/(\w+)(이\/가)/g, (match, p1, p2) => p1 + adjustParticle(p1, p2));
-        processedSegment = processedSegment.replace(/(\w+)(을\/를)/g, (match, p1, p2) => p1 + adjustParticle(p1, p2));
-        processedSegment = processedSegment.replace(/(\w+)(와\/과)/g, (match, p1, p2) => p1 + adjustParticle(p1, p2));
-        processedSegment = processedSegment.replace(/(\w+)(으로\/로)/g, (match, p1, p2) => p1 + adjustParticle(p1, p2));
+        // Re-attach original punctuation if it was removed and the new ending didn't include it
+        if (currentPunctuation && !sentence.includes(currentPunctuation.charAt(0))) {
+             sentence += currentPunctuation;
+        }
+
+        // 5. Apply Josa (Particle) Adjustment (Best effort, targeting common patterns)
+        // This attempts to correct particles in common structures after other transformations
+        sentence = sentence.replace(/(\w+)(은\/는)/g, (match, p1) => p1 + getJosa(p1, '은/는'));
+        sentence = sentence.replace(/(\w+)(이\/가)/g, (match, p1) => p1 + getJosa(p1, '이/가'));
+        sentence = sentence.replace(/(\w+)(을\/를)/g, (match, p1) => p1 + getJosa(p1, '을/를'));
+        sentence = sentence.replace(/(\w+)(와\/과)/g, (match, p1) => p1 + getJosa(p1, '와/과'));
+        sentence = sentence.replace(/(\w+)(으로\/로)/g, (match, p1) => p1 + getJosa(p1, '으로/로'));
+        sentence = sentence.replace(/(\w+)(아\/야)/g, (match, p1) => p1 + getJosa(p1, '아/야'));
 
 
-        princessSegments.push(processedSegment);
+        princessSentences.push(sentence);
     }
-    result = princessSegments.join('');
+    result = princessSentences.join(' '); // Join with space, then clean up
 
-    // Remove any double spaces that might have occurred from insertions
-    result = result.replace(/\s{2,}/g, ' ');
+    // Remove any double spaces that might have occurred from insertions and trim
+    result = result.replace(/\s{2,}/g, ' ').trim();
+
+    // Ensure the entire text ends with a valid princess decoration if it doesn't already
+    if (!result.match(/[.!?]$/)) {
+        result += getRandomElement(SENTENCE_END_DECORATIONS);
+        emojiCount += 2;
+        exaggeratedPhraseCount++;
+    }
+
 
     // Store counts for Princess Power calculation
     return {
-        text: result.trim(),
+        text: result, // Trimmed result
         pronounCount: pronounCount,
         exaggeratedPhraseCount: exaggeratedPhraseCount,
         emojiCount: emojiCount,
