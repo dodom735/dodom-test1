@@ -1,114 +1,85 @@
-const inputText = document.getElementById('input-text');
-const translateButton = document.getElementById('translate-button');
-const resultText = document.getElementById('result-text');
-const copyButton = document.getElementById('copy-button');
-const toastMessage = document.getElementById('toast-message');
-const princessPowerDisplay = document.getElementById('princess-power');
-const princessTitleDisplay = document = document.getElementById('princess-title');
-
-// --- 데이터 설정 (기존 데이터 유지 및 강화) ---
+// --- [1. 데이터 정의: 더 화려하고 미치게] ---
 const PRONOUN_MAP = {
-    '나': '공주는', '나는': '공주는', '내가': '공주가', '내': '공주의', '저': '공주는', '저는': '공주는', '제가': '공주가', '저의': '공주의',
-    '우리': '공주님들은', '우리들은': '공주님들은', '우리가': '공주님들이'
+    '나': '공주는', '나는': '공주는', '내가': '공주가', '내': '공주의', '저': '공주는', '저는': '공주는', '제가': '공주가'
 };
 
 const NOUN_MAP = {
-    '집': '화려한 장미 궁궐', '돈': '반짝이는 금화', '밥': '고귀한 만찬(수라상)', '학교': '지식의 상아탑', '회사': '황금빛 직무 궁전',
-    '친구': '소중한 벗', '시간': '찬란한 순간', '배고파': '고귀한 알람이 울리옵니다', '졸려': '잠이 쏟아지옵니다'
+    '집': '장미 향기가 가득한 비밀 궁궐',
+    '돈': '반짝이는 순금 다이아몬드',
+    '밥': '천상의 맛을 담은 고귀한 만찬',
+    '코딩': '찬란한 보석을 수놓는 바이브 코딩',
+    '오늘': '눈부시게 아름다운 금일',
+    '친구': '소중하고 우아한 나의 벗'
 };
 
-const EXAGGERATED_PHRASES = [
-    '오늘도 공주는', '아가 공주는', '아가 토끼 공주는', '천사 공주께서는', '눈부신 미모의 공주가 말하길,'
-];
+const ADJECTIVES = ['눈부신', '황홀한', '사랑스러운', '고귀한', '은하수 같은', '장미빛'];
+const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '💫', '🌟', '🌷', '🦋', '🦢'];
 
-const CONNECTIVES = ['하시옵고,', '이옵나니,', '하시매,', '이옵고,', '그러하시온데,', '또한,'];
-
-const EMOJIS = ['👑', '✨', '💖', '🥹', '🎀', '💎', '🌸', '🧚‍♀️', '💫', '🌟', '🌷'];
-
-const SENTENCE_END_TRANSFORMATIONS = [
-    { regex: /(맞나|인가|인가요|맞나요)\?*$/, replacement: '참말로 옳사옵니까? 오호호, 그리 여쭈옵니다! ✨' },
-    { regex: /(어|다|아|요|죠|니)\.*$/, replacement: '이옵니다, 잊지 마시옵소서! 🌸' }
-];
-
-// --- 헬퍼 함수 ---
-function getRandomElement(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+// --- [2. 핵심 유틸리티: 조사 자동 교정] ---
+function getJosa(word, type) {
+    const lastChar = word.charCodeAt(word.length - 1);
+    const hasBatchim = (lastChar - 0xac00) % 28 > 0;
+    const josaMap = {
+        '이/가': hasBatchim ? '이' : '가',
+        '은/는': hasBatchim ? '은' : '는',
+        '을/를': hasBatchim ? '을' : '를'
+    };
+    return josaMap[type] || '';
 }
 
-// 조사 자동 교정 (은/는, 이/가 등)
-function fixJosa(text) {
-    return text.replace(/([가-힣])(은\/는|이\/가|을\/를)/g, (match, word, josa) => {
-        const lastChar = word.charCodeAt(word.length - 1);
-        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
-        const josaMap = {
-            '은/는': hasBatchim ? '은' : '는',
-            '이/가': hasBatchim ? '이' : '가',
-            '을/를': hasBatchim ? '을' : '를'
-        };
-        return word + josaMap[josa];
-    });
-}
-
-// --- 메인 변환 로직 ---
+// --- [3. 메인 변환 로직: 통합형 만연체] ---
 function convertToPrincessSpeak(text) {
     if (!text.trim()) return { text: "평범한 말을 적어주세요! 🥹", power: 0 };
 
     let result = text.trim();
 
-    // 1. 명사 및 대명사 치환
+    // 1. 단어 치환 및 조사 예약
     Object.keys(NOUN_MAP).forEach(key => {
-        // Use a more robust word boundary for Korean, matching any non-Korean character or whitespace
-        const regex = new RegExp(`(?<=\\s|^)${key}(?=\\s|$)`, 'g');
-        result = result.replace(regex, NOUN_MAP[key]);
+        const replacement = NOUN_MAP[key];
+        // 조사가 붙을 수 있는 자리를 예약함
+        result = result.split(key + "가").join(replacement + "이/가");
+        result = result.split(key + "이").join(replacement + "이/가");
+        result = result.split(key + "는").join(replacement + "은/는");
+        result = result.split(key + "은").join(replacement + "은/는");
+        result = result.split(key).join(replacement);
     });
+
     Object.keys(PRONOUN_MAP).forEach(key => {
-        const regex = new RegExp(`(?<=\\s|^)${key}(?=\\s|$)`, 'g');
-        result = result.replace(regex, PRONOUN_MAP[key]);
+        result = result.split(key).join(PRONOUN_MAP[key]);
     });
 
-    // 2. 문장 쪼개기 및 중간 연결
-    // 마침표나 물음표로 문장을 나누되, 마지막 조각은 따로 처리함
-    let segments = result.split(/[.!?]\s*/).filter(s => s.length > 0);
+    // 2. 시작과 끝 수식어 (딱 한 번만!)
+    result = "오호호! ✨ 아가 공주는 " + result;
     
-    // 시작 수식어 (딱 한 번)
-    let princessFullText = getRandomElement(EXAGGERATED_PHRASES) + " ";
+    // 3. 문장 종결 처리 (중복 방지)
+    result = result.replace(/[.!?\s]+$/, ""); // 기존 마침표 제거
+    if (result.endsWith("나") || result.endsWith("까")) {
+        result += "라고 감히 여쭈어봐도 되겠사와요? 💖";
+    } else {
+        result += "라고 생각하옵니다, 잊지 마시옵소서! 🌸";
+    }
 
-    segments.forEach((seg, index) => {
-        let currentSeg = seg.trim();
-        
-        if (index < segments.length - 1) {
-            // 중간 문장들: 연결 어미로 부드럽게 잇기
-            // '어', '다', '요', '죠' 등으로 끝나는 어미를 제거하고 연결 어미 추가
-            currentSeg = currentSeg.replace(/(어|다|요|죠|니)$/, ""); // 더 많은 어미 고려
-            princessFullText += currentSeg + getRandomElement(CONNECTIVES) + " ";
-        } else {
-            // 마지막 문장: 화려한 종결 어미 적용
-            let transformed = false;
-            for (const rule of SENTENCE_END_TRANSFORMATIONS) {
-                if (rule.regex.test(currentSeg)) {
-                    currentSeg = currentSeg.replace(rule.regex, rule.replacement);
-                    transformed = true;
-                    break;
-                }
-            }
-            if (!transformed) princessFullText += currentSeg + " 이옵니다, 오호호! ✨";
-            else princessFullText += currentSeg; // 이미 변환되었으면 추가 장식 없음
-        }
+    // 4. 광기 불어넣기 (단어 사이 형용사 및 이모지 폭탄)
+    let words = result.split(" ");
+    let crazyResult = words.map(word => {
+        let decorated = word;
+        if (Math.random() < 0.4) decorated = getRandomElement(ADJECTIVES) + " " + decorated;
+        if (Math.random() < 0.6) decorated += getRandomElement(EMOJIS);
+        return decorated;
+    }).join(" ");
+
+    // 5. 최종 조사 교정
+    crazyResult = crazyResult.replace(/([가-힣])(이\/가|은\/는|을\/를)/g, (match, word, type) => {
+        return word + getJosa(word, type);
     });
-
-    // 3. 이모지 무작위 삽입 (광기 보정)
-    let finalResult = princessFullText.split(" ").map(word => 
-        Math.random() < 0.3 ? word + getRandomElement(EMOJIS) : word
-    ).join(" ");
-
-    // 4. 조사 최종 교정
-    finalResult = fixJosa(finalResult);
 
     return {
-        text: finalResult,
-        power: Math.min(100, Math.floor((finalResult.length / text.length) * 20 + 40))
+        text: crazyResult,
+        power: Math.min(100, Math.floor(crazyResult.length / text.length * 15 + 40))
     };
 }
+
+function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 // --- 이벤트 리스너 및 실행 ---
 translateButton.addEventListener('click', () => {
@@ -119,8 +90,10 @@ translateButton.addEventListener('click', () => {
     setTimeout(() => {
         const result = convertToPrincessSpeak(input);
         resultText.textContent = result.text;
-        princessPowerDisplay.textContent = `공주력: ${result.power}%`;
-        princessTitleDisplay.textContent = `칭호: ${result.power > 80 ? '진정한 광기의 공주' : '수줍은 아가 공주'}`;
+        // princessPowerDisplay와 princessTitleDisplay를 직접 업데이트
+        const power = result.power;
+        princessPowerDisplay.textContent = `공주력: ${power}%`;
+        princessTitleDisplay.textContent = `칭호: ${power > 80 ? '진정한 광기의 공주' : '수줍은 아가 공주'}`;
         
         translateButton.disabled = false;
         translateButton.textContent = '✨ 공주로 만들어줘 ✨';
