@@ -2,7 +2,7 @@
 // ⚠️ 경고: 이 파일에 API 키를 직접 노출하는 것은 보안상 매우 위험합니다! ⚠️
 // 실제 서비스에서는 반드시 백엔드 서버를 통해 API 키를 안전하게 관리해야 합니다.
 // 사용자 요청에 따라 클라이언트 측에서 직접 API를 호출하도록 구현되었습니다.
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // 여기에 Gemini API 키를 입력하세요!
+const GEMINI_API_KEY = "AIzaSyAG7shKAIIGpQzH7nXaCOqf7q6KwWaoQGQ"; // 여기에 Gemini API 키를 입력하세요!
 
 // Google Generative AI SDK (CDN을 통해 로드)
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
